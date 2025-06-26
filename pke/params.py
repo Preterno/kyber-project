@@ -22,9 +22,20 @@ class MLKEMParams:
         return 384 * self.k + 32
     
     @property
+    def pke_sk_bytes(self) -> int:
+        """Size of PKE secret key (dk_PKE) in bytes."""
+        # Each of the k polynomials in s is 384 bytes (256 coeffs * 12 bits/coeff / 8 bits/byte)
+        return (256 * 12 // 8) * self.k
+
+    @property
     def sk_bytes(self) -> int:
         """Size of secret key (decapsulation key) in bytes."""
-        return 768 * self.k + 96
+        # dk = dk_PKE || ek_PKE || H(ek_PKE) || z
+        # dk_PKE = pke_sk_bytes
+        # ek_PKE = pk_bytes
+        # H(ek_PKE) = 32 bytes
+        # z = 32 bytes
+        return self.pke_sk_bytes + self.pk_bytes + 32 + 32
     
     @property
     def ct_bytes(self) -> int:  
