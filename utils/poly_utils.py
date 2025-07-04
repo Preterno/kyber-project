@@ -1,8 +1,8 @@
 import numpy as np
 from typing import List, Tuple
-from pke.params import N, Q, ZETA
-from utils.hash_utils import XOF, PRF
-from utils.serialization import bytes_to_bits
+from kyber_project.pke.params import N, Q, ZETA
+from kyber_project.utils.hash_utils import XOF, PRF
+from kyber_project.utils.serialization import bytes_to_bits
 
 def bit_rev_7(x: int) -> int:
     result = 0

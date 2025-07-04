@@ -1,5 +1,5 @@
 from typing import List
-from pke.params import N, Q
+from kyber_project.pke.params import N, Q
 
 def bits_to_bytes(bits: List[int]) -> bytes:
     if len(bits) % 8 != 0:

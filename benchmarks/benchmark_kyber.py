@@ -15,10 +15,10 @@ import os
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from kem.keygen import ml_kem_keygen
-from kem.encapsulate import ml_kem_encaps
-from kem.decapsulate import ml_kem_decaps
-from pke.params import ML_KEM_512, ML_KEM_768, ML_KEM_1024
+from kyber_project.kem.keygen import ml_kem_keygen
+from kyber_project.kem.encapsulate import ml_kem_encaps
+from kyber_project.kem.decapsulate import ml_kem_decaps
+from kyber_project.pke.params import ML_KEM_512, ML_KEM_768, ML_KEM_1024
 
 def benchmark_operation(operation_name, operation_func, iterations=50):
     """Benchmark a single operation."""

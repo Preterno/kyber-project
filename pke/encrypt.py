@@ -1,8 +1,8 @@
 import numpy as np
 from typing import List
-from pke.params import MLKEMParams, N, Q
-from utils.poly_utils import sample_poly_cbd, ntt, intt, matrix_vector_multiply_ntt, dot_product_ntt
-from utils.serialization import byte_decode_12, byte_encode_du, byte_encode_dv, bits_to_bytes
+from kyber_project.pke.params import MLKEMParams, N, Q
+from kyber_project.utils.poly_utils import sample_poly_cbd, ntt, intt, matrix_vector_multiply_ntt, dot_product_ntt
+from kyber_project.utils.serialization import byte_decode_12, byte_encode_du, byte_encode_dv, bits_to_bytes
 
 def k_pke_encrypt(ek_pke: bytes, m: bytes, r: bytes, params: MLKEMParams) -> bytes:
     if len(m) != 32:
@@ -45,15 +45,15 @@ def parse_public_key(ek_pke: bytes, k: int) -> tuple:
     return t_hat, rho
 
 def sample_matrix_A(rho: bytes, k: int) -> list:
-    from pke.keygen import sample_matrix_A as keygen_sample_matrix_A
+    from kyber_project.pke.keygen import sample_matrix_A as keygen_sample_matrix_A
     return keygen_sample_matrix_A(rho, k)
 
 def sample_error_vector_encrypt(r: bytes, k: int, eta: int, offset: int) -> list:
-    from pke.keygen import sample_error_vector
+    from kyber_project.pke.keygen import sample_error_vector
     return sample_error_vector(r, k, eta, offset)
 
 def matrix_transpose_vector_multiply_ntt(A_hat: list, r1_hat: list) -> list:
-    from utils.poly_utils import multiply_ntts, add_poly
+    from kyber_project.utils.poly_utils import multiply_ntts, add_poly
     k = len(r1_hat)
     result = []
     for j in range(k):
