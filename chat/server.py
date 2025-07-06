@@ -2,14 +2,25 @@ import socket
 import threading
 import time
 import os
-from kyber_project.chat.kem_runtime import (
-    ml_kem_keygen,
-    ml_kem_encaps,   
-    ml_kem_decaps,
-    ML_KEM_768
-)
+import sys
 
-from kyber_project.chat.aes_utils import aes_encrypt, aes_decrypt
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from pke.params import ML_KEM_768
+from kem.keygen import ml_kem_keygen
+from kem.encapsulate import ml_kem_encaps
+from kem.decapsulate import ml_kem_decaps
+from Crypto.Cipher import AES
+
+def aes_encrypt(key: bytes, plaintext: bytes, nonce: bytes):
+    cipher = AES.new(key, AES.MODE_GCM, nonce=nonce)
+    ciphertext, tag = cipher.encrypt_and_digest(plaintext)
+    return ciphertext, tag
+
+def aes_decrypt(key: bytes, ciphertext: bytes, nonce: bytes, tag: bytes):
+    cipher = AES.new(key, AES.MODE_GCM, nonce=nonce)
+    return cipher.decrypt_and_verify(ciphertext, tag)
 
 HOST = '127.0.0.1'
 PORT = 65432

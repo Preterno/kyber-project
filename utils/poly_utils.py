@@ -1,8 +1,8 @@
 import numpy as np
 from typing import List, Tuple
-from kyber_project.pke.params import N, Q, ZETA
-from kyber_project.utils.hash_utils import XOF, PRF
-from kyber_project.utils.serialization import bytes_to_bits
+from pke.params import N, Q, ZETA
+from utils.hash_utils import XOF, PRF
+from utils.serialization import bytes_to_bits
 
 def bit_rev_7(x: int) -> int:
     result = 0
@@ -109,7 +109,14 @@ def sample_ntt(B: bytes) -> List[int]:
     xof = XOF(rho, i, j)
     a_hat = [0] * N
     idx = 0
+    max_iterations = N * 10  # Safety limit: 10x expected iterations
+    iterations = 0
+    
     while idx < N:
+        iterations += 1
+        if iterations > max_iterations:
+            raise RuntimeError(f"sample_ntt: Exceeded maximum iterations ({max_iterations}). This suggests a problem with the XOF.")
+        
         C = xof.squeeze(3)
         d1 = C[0] + 256 * (C[1] % 16)
         d2 = (C[1] // 16) + 16 * C[2]

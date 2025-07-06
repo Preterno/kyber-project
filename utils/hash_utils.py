@@ -38,8 +38,15 @@ class XOF:
             raise ValueError("i must be in range [0, 255]")
         if not (0 <= j <= 255):
             raise ValueError("j must be in range [0, 255]")
-        self._shake = hashlib.shake_128()
-        self._shake.update(rho + bytes([i, j]))
+        self._input = rho + bytes([i, j])
+        self._output_so_far = 0
 
     def squeeze(self, length: int) -> bytes:
-        return self._shake.digest(length)
+        # Create a fresh SHAKE instance each time to avoid state corruption
+        shake = hashlib.shake_128()
+        shake.update(self._input)
+        # Skip the bytes we've already output, then get the next 'length' bytes
+        total_output = shake.digest(self._output_so_far + length)
+        result = total_output[self._output_so_far:self._output_so_far + length]
+        self._output_so_far += length
+        return result

@@ -12,34 +12,30 @@ import time
 import sys
 import os
 
-# Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from kyber_project.kem.keygen import ml_kem_keygen
-from kyber_project.kem.encapsulate import ml_kem_encaps
-from kyber_project.kem.decapsulate import ml_kem_decaps
-from kyber_project.pke.params import ML_KEM_512, ML_KEM_768, ML_KEM_1024
+from kem.keygen import ml_kem_keygen
+from kem.encapsulate import ml_kem_encaps
+from kem.decapsulate import ml_kem_decaps
+from pke.params import ML_KEM_512, ML_KEM_768, ML_KEM_1024
 
 def benchmark_operation(operation_name, operation_func, iterations=50):
     """Benchmark a single operation."""
     print(f"\nBenchmarking {operation_name} ({iterations} iterations)...")
     
-    # Warm up
     for _ in range(5):
         operation_func()
     
-    # Actual timing
     times = []
     for i in range(iterations):
         start = time.perf_counter()
         result = operation_func()
         end = time.perf_counter()
-        times.append((end - start) * 1000)  # Convert to ms
+        times.append((end - start) * 1000)  
         
         if i % 10 == 0:
             print(f"  Progress: {i+1}/{iterations}")
     
-    # Calculate statistics
     avg_time = sum(times) / len(times)
     min_time = min(times)
     max_time = max(times)
@@ -62,31 +58,26 @@ def benchmark_kyber_variant(params):
     print(f"Security Level: {params.security_category}")
     print(f"{'='*60}")
     
-    # Pre-generate keys for encaps/decaps testing
     test_ek, test_dk = ml_kem_keygen(params)
     test_K, test_c = ml_kem_encaps(test_ek, params)
     
     results = {}
     
-    # Benchmark Key Generation
     results['keygen'] = benchmark_operation(
         "Key Generation",
         lambda: ml_kem_keygen(params)
     )
     
-    # Benchmark Encapsulation
     results['encaps'] = benchmark_operation(
         "Encapsulation", 
         lambda: ml_kem_encaps(test_ek, params)
     )
     
-    # Benchmark Decapsulation
     results['decaps'] = benchmark_operation(
         "Decapsulation",
         lambda: ml_kem_decaps(test_dk, test_c, params)
     )
     
-    # Benchmark Full KEM Cycle
     def full_cycle():
         ek, dk = ml_kem_keygen(params)
         K1, c = ml_kem_encaps(ek, params)
@@ -98,7 +89,6 @@ def benchmark_kyber_variant(params):
         full_cycle
     )
     
-    # Print summary
     print(f"\n{params.name} PERFORMANCE SUMMARY:")
     print("-" * 40)
     print(f"KeyGen:     {results['keygen']['avg_ms']:.2f} ms ({results['keygen']['ops_per_sec']:.1f} ops/sec)")
@@ -107,7 +97,6 @@ def benchmark_kyber_variant(params):
     print(f"Full Cycle: {results['full_cycle']['avg_ms']:.2f} ms ({results['full_cycle']['ops_per_sec']:.1f} ops/sec)")
     print(f"Total Memory: {sum(r['memory_mb'] for r in results.values() if 'memory_mb' in r):.2f} MB")
     
-    # Key sizes
     ek, dk = ml_kem_keygen(params)
     K, c = ml_kem_encaps(ek, params)
     print(f"\nKEY SIZES:")
@@ -155,7 +144,6 @@ def main():
             print(f"Error benchmarking {name}: {e}")
             continue
     
-    # Print final comparison
     if all_results:
         print_comparison_table(all_results)
     

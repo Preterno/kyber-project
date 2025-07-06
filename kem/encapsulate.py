@@ -1,8 +1,8 @@
 from typing import Tuple
-from kyber_project.pke.params import MLKEMParams
-from kyber_project.pke.encrypt import k_pke_encrypt
-from kyber_project.utils.hash_utils import H, J, G
-from kyber_project.utils.random_utils import random_bytes
+from pke.params import MLKEMParams
+from pke.encrypt import k_pke_encrypt
+from utils.hash_utils import H, J, G
+from utils.random_utils import random_bytes
 
 def ml_kem_encaps(ek: bytes, params: MLKEMParams) -> Tuple[bytes, bytes]:
     if len(ek) != params.pk_bytes:

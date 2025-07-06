@@ -1,8 +1,8 @@
 import numpy as np
 from typing import List
-from kyber_project.pke.params import MLKEMParams, N, Q
-from kyber_project.utils.poly_utils import ntt, intt, dot_product_ntt
-from kyber_project.utils.serialization import byte_decode_12, byte_decode_du, byte_decode_dv
+from pke.params import MLKEMParams, N, Q
+from utils.poly_utils import ntt, intt, dot_product_ntt
+from utils.serialization import byte_decode_12, byte_decode_du, byte_decode_dv
 
 def k_pke_decrypt(dk_pke: bytes, c: bytes, params: MLKEMParams) -> bytes:
 

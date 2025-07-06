@@ -1,9 +1,9 @@
 import numpy as np
-from typing import Tuple
-from kyber_project.pke.params import MLKEMParams, N, Q
-from kyber_project.utils.hash_utils import G
-from kyber_project.utils.poly_utils import sample_uniform_poly, sample_poly_cbd, ntt, matrix_vector_multiply_ntt
-from kyber_project.utils.serialization import byte_encode_12
+from pke.params import MLKEMParams, N, Q
+from utils.hash_utils import G
+from utils.poly_utils import sample_uniform_poly, sample_poly_cbd, ntt, matrix_vector_multiply_ntt
+from utils.serialization import byte_encode_12
+from typing import Tuple, List
 
 def k_pke_keygen(d: bytes, params: MLKEMParams) -> Tuple[bytes, bytes]:
 

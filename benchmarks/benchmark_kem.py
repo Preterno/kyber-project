@@ -11,27 +11,24 @@ import time
 import sys
 import os
 
-# Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from kyber_project.kem.keygen import ml_kem_keygen
-from kyber_project.kem.encapsulate import ml_kem_encaps, ml_kem_encaps_deterministic
-from kyber_project.kem.decapsulate import ml_kem_decaps
-from kyber_project.pke.params import ML_KEM_512, ML_KEM_768, ML_KEM_1024
+from kem.keygen import ml_kem_keygen
+from kem.encapsulate import ml_kem_encaps, ml_kem_encaps_deterministic
+from kem.decapsulate import ml_kem_decaps
+from pke.params import ML_KEM_512, ML_KEM_768, ML_KEM_1024
 
 def time_operation(operation_func, iterations=25):
     """Time an operation and return statistics."""
-    # Warm up
     for _ in range(3):
         operation_func()
     
-    # Time the operation
     times = []
     for _ in range(iterations):
         start = time.perf_counter()
         operation_func()
         end = time.perf_counter()
-        times.append((end - start) * 1000)  # Convert to ms
+        times.append((end - start) * 1000)  
     
     return {
         'avg_ms': sum(times) / len(times),
@@ -48,24 +45,20 @@ def benchmark_kem_operations(params, iterations=25):
     
     results = {}
     
-    # Key Generation
     print("  → Key Generation...")
     results['keygen'] = time_operation(
         lambda: ml_kem_keygen(params),
         iterations
     )
     
-    # Pre-generate keys for other operations
     ek, dk = ml_kem_keygen(params)
     
-    # Encapsulation
     print("  → Encapsulation...")
     results['encaps'] = time_operation(
         lambda: ml_kem_encaps(ek, params),
         iterations
     )
     
-    # Decapsulation (using a fresh ciphertext each time)
     print("  → Decapsulation...")
     def decaps_op():
         _, c = ml_kem_encaps(ek, params)
@@ -73,7 +66,6 @@ def benchmark_kem_operations(params, iterations=25):
     
     results['decaps'] = time_operation(decaps_op, iterations)
     
-    # Full KEM cycle
     print("  → Full KEM Cycle...")
     def full_cycle():
         ek_temp, dk_temp = ml_kem_keygen(params)
@@ -84,7 +76,6 @@ def benchmark_kem_operations(params, iterations=25):
     
     results['full_cycle'] = time_operation(full_cycle, iterations)
     
-    # Key sizes
     K, c = ml_kem_encaps(ek, params)
     results['sizes'] = {
         'public_key_bytes': len(ek),
@@ -93,7 +84,6 @@ def benchmark_kem_operations(params, iterations=25):
         'shared_secret_bytes': len(K)
     }
     
-    # Throughput (operations per second)
     results['throughput'] = {
         'keygen_ops_per_sec': 1000 / results['keygen']['avg_ms'],
         'encaps_ops_per_sec': 1000 / results['encaps']['avg_ms'],
@@ -108,20 +98,17 @@ def print_performance_summary(variant_name, results):
     print(f"\n{variant_name} PERFORMANCE:")
     print("-" * 40)
     
-    # Timing
     print(f"KeyGen:     {results['keygen']['avg_ms']:.2f} ms")
     print(f"Encaps:     {results['encaps']['avg_ms']:.2f} ms") 
     print(f"Decaps:     {results['decaps']['avg_ms']:.2f} ms")
     print(f"Full Cycle: {results['full_cycle']['avg_ms']:.2f} ms")
     
-    # Throughput
     print(f"\nTHROUGHPUT:")
     print(f"KeyGen:     {results['throughput']['keygen_ops_per_sec']:.1f} ops/sec")
     print(f"Encaps:     {results['throughput']['encaps_ops_per_sec']:.1f} ops/sec")
     print(f"Decaps:     {results['throughput']['decaps_ops_per_sec']:.1f} ops/sec")
     print(f"Full Cycle: {results['throughput']['full_cycle_ops_per_sec']:.1f} ops/sec")
     
-    # Sizes
     sizes = results['sizes']
     print(f"\nKEY SIZES:")
     print(f"Public Key:    {sizes['public_key_bytes']:,} bytes")
@@ -134,7 +121,6 @@ def test_correctness(params, test_rounds=10):
     print(f"\nTesting {params.name} correctness ({test_rounds} rounds)...")
     
     for i in range(test_rounds):
-        # Test normal encapsulation
         ek, dk = ml_kem_keygen(params)
         K1, c = ml_kem_encaps(ek, params)
         K2 = ml_kem_decaps(dk, c, params)
@@ -143,7 +129,6 @@ def test_correctness(params, test_rounds=10):
             print(f"   FAILED at round {i+1}")
             return False
         
-        # Test deterministic encapsulation
         message = b"Test message for deterministic!!"
         K3, c3 = ml_kem_encaps_deterministic(ek, message, params)
         K4, c4 = ml_kem_encaps_deterministic(ek, message, params)
@@ -161,12 +146,10 @@ def print_comparison_table(all_results):
     print("KEM PERFORMANCE COMPARISON")
     print(f"{'='*80}")
     
-    # Header
     print(f"{'Variant':<12} {'KeyGen':<10} {'Encaps':<10} {'Decaps':<10} {'Cycle':<10} {'PK Size':<10}")
     print(f"{'':12} {'(ms)':<10} {'(ms)':<10} {'(ms)':<10} {'(ms)':<10} {'(bytes)':<10}")
     print("-" * 80)
     
-    # Data
     for variant, results in all_results.items():
         keygen_time = results['keygen']['avg_ms']
         encaps_time = results['encaps']['avg_ms']
@@ -198,7 +181,6 @@ def main():
     
     all_results = {}
     
-    # Test correctness first
     print("CORRECTNESS TESTING:")
     print("=" * 40)
     all_correct = True
@@ -213,7 +195,6 @@ def main():
     
     print("\n All variants passed correctness tests!")
     
-    # Run performance benchmarks
     print("\n\nPERFORMANCE BENCHMARKING:")
     print("=" * 40)
     
@@ -225,7 +206,6 @@ def main():
         except Exception as e:
             print(f"Error benchmarking {name}: {e}")
     
-    # Print final comparison
     if all_results:
         print_comparison_table(all_results)
     

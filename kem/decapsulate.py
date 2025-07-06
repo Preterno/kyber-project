@@ -1,7 +1,7 @@
-from kyber_project.pke.params import MLKEMParams
-from kyber_project.pke.decrypt import k_pke_decrypt
-from kyber_project.pke.encrypt import k_pke_encrypt
-from kyber_project.utils.hash_utils import H, J, G
+from pke.params import MLKEMParams
+from pke.decrypt import k_pke_decrypt
+from pke.encrypt import k_pke_encrypt
+from utils.hash_utils import H, J, G
 from typing import Tuple
 
 def ml_kem_decaps(dk: bytes, c: bytes, params: MLKEMParams) -> bytes:
