@@ -64,26 +64,6 @@ def decompress(y: int, d: int) -> int:
         raise ValueError("d must be less than 12")
     return (y * Q + (2 ** (d - 1))) // (2 ** d)
 
-def poly_to_bytes(poly: List[int], q: int = Q, n: int = N) -> bytes:
-    return byte_encode(poly, 12)
-
-def bytes_to_poly(data: bytes, q: int = Q) -> List[int]:
-    return byte_decode(data, 12)
-
-def vec_to_bytes(vec: List[List[int]]) -> bytes:
-    return b''.join(byte_encode(poly, 12) for poly in vec)
-
-def bytes_to_vec(data: bytes, k: int, n: int = N) -> List[List[int]]:
-    poly_len = n * 12 // 8
-    result = []
-    for i in range(k):
-        start = i * poly_len
-        end = start + poly_len
-        poly_bytes = data[start:end]
-        poly = byte_decode(poly_bytes, 12)
-        result.append(poly)
-    return result
-
 def byte_encode_12(f: List[int]) -> bytes:
     return byte_encode(f, 12)
 
@@ -101,4 +81,3 @@ def byte_encode_dv(f: List[int], dv: int) -> bytes:
 
 def byte_decode_dv(data: bytes, dv: int) -> List[int]:
     return byte_decode(data, dv)
-

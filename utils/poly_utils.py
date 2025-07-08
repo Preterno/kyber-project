@@ -142,50 +142,10 @@ def sample_poly_cbd(sigma: bytes, nonce: int, eta: int) -> List[int]:
         f[i] = (x - y) % Q
     return f
 
-def sample_poly_cbd_raw(B: bytes, eta: int) -> List[int]:
-    if eta not in {2, 3}:
-        raise ValueError("eta must be 2 or 3")
-    if len(B) != 64 * eta:
-        raise ValueError(f"Input must be {64 * eta} bytes")
-    bits = bytes_to_bits(B)
-    f = [0] * N
-    for i in range(N):
-        x = sum(bits[2 * i * eta + j] for j in range(eta))
-        y = sum(bits[2 * i * eta + eta + j] for j in range(eta))
-        f[i] = (x - y) % Q
-    return f
-
-def sample_poly(n: int = N, q: int = Q) -> List[int]:
-    return [np.random.randint(0, q) for _ in range(n)]
-
 def add_poly(a: List[int], b: List[int], q: int = Q) -> List[int]:
     if len(a) != len(b):
         raise ValueError("Polynomials must have same length")
     return [(x + y) % q for x, y in zip(a, b)]
-
-def sub_poly(a: List[int], b: List[int], q: int = Q) -> List[int]:
-    if len(a) != len(b):
-        raise ValueError("Polynomials must have same length")
-    return [(x - y) % q for x, y in zip(a, b)]
-
-def mul_poly(a: List[int], b: List[int], q: int = Q) -> List[int]:
-    if len(a) != N or len(b) != N:
-        raise ValueError(f"Polynomials must have length {N}")
-    a_hat = ntt(a)
-    b_hat = ntt(b)
-    c_hat = multiply_ntts(a_hat, b_hat)
-    return ntt_inverse(c_hat)
-
-def scalar_mul_poly(scalar: int, poly: List[int], q: int = Q) -> List[int]:
-    return [(scalar * coeff) % q for coeff in poly]
-
-def add_poly_vec(a: List[List[int]], b: List[List[int]], q: int = Q) -> List[List[int]]:
-    if len(a) != len(b):
-        raise ValueError("Vectors must have same length")
-    return [add_poly(a[i], b[i], q) for i in range(len(a))]
-
-def scalar_mul_poly_vec(scalar: int, vec: List[List[int]], q: int = Q) -> List[List[int]]:
-    return [scalar_mul_poly(scalar, poly, q) for poly in vec]
 
 def matrix_vector_mul_ntt(A_hat, s_hat):
     k = len(s_hat)
@@ -196,15 +156,6 @@ def matrix_vector_mul_ntt(A_hat, s_hat):
             product = multiply_ntts(A_hat[i][j], s_hat[j])
             component = add_poly(component, product, Q)
         result.append(component)
-    return result
-
-def vector_transpose_mul_ntt(s_hat: List[List[int]], u_hat: List[List[int]]) -> List[int]:
-    k = len(s_hat)
-    result = [0] * N
-    for j in range(k):
-        product = multiply_ntts(s_hat[j], u_hat[j])
-        for i in range(N):
-            result[i] = (result[i] + product[i]) % Q
     return result
 
 def sample_uniform_poly(rho: bytes, i: int, j: int) -> List[int]:
@@ -224,4 +175,3 @@ def dot_product_ntt(t_hat: List[List[int]], r1_hat: List[List[int]]) -> List[int
     return result
 
 intt = ntt_inverse
-

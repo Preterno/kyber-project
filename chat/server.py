@@ -4,12 +4,10 @@ import time
 import os
 import sys
 
-# Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from pke.params import ML_KEM_768
 from kem.keygen import ml_kem_keygen
-from kem.encapsulate import ml_kem_encaps
 from kem.decapsulate import ml_kem_decaps
 from Crypto.Cipher import AES
 
