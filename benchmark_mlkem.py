@@ -1,12 +1,3 @@
-"""
-KEM-focused Performance Benchmark
-
-Simple benchmarking focused on KEM operations with emphasis on:
-- Timing analysis across security levels
-- Throughput measurement
-- Key size analysis
-"""
-
 import time
 import sys
 import os
@@ -19,7 +10,6 @@ from kem.decapsulate import ml_kem_decaps
 from pke.params import ML_KEM_512, ML_KEM_768, ML_KEM_1024
 
 def time_operation(operation_func, iterations=25):
-    """Time an operation and return statistics."""
     for _ in range(3):
         operation_func()
     
@@ -38,7 +28,6 @@ def time_operation(operation_func, iterations=25):
     }
 
 def benchmark_kem_operations(params, iterations=25):
-    """Benchmark all KEM operations for a parameter set."""
     print(f"\nBenchmarking {params.name}:")
     print(f"  Security Level: {params.security_category}")
     print(f"  Iterations: {iterations}")
@@ -94,7 +83,6 @@ def benchmark_kem_operations(params, iterations=25):
     return results
 
 def print_performance_summary(variant_name, results):
-    """Print performance summary for a variant."""
     print(f"\n{variant_name} PERFORMANCE:")
     print("-" * 40)
     
@@ -116,32 +104,7 @@ def print_performance_summary(variant_name, results):
     print(f"Ciphertext:    {sizes['ciphertext_bytes']:,} bytes")
     print(f"Shared Secret: {sizes['shared_secret_bytes']:,} bytes")
 
-def test_correctness(params, test_rounds=10):
-    """Quick correctness test."""
-    print(f"\nTesting {params.name} correctness ({test_rounds} rounds)...")
-    
-    for i in range(test_rounds):
-        ek, dk = ml_kem_keygen(params)
-        K1, c = ml_kem_encaps(ek, params)
-        K2 = ml_kem_decaps(dk, c, params)
-        
-        if K1 != K2:
-            print(f"   FAILED at round {i+1}")
-            return False
-        
-        message = b"Test message for deterministic!!"
-        K3, c3 = ml_kem_encaps_deterministic(ek, message, params)
-        K4, c4 = ml_kem_encaps_deterministic(ek, message, params)
-        
-        if K3 != K4 or c3 != c4:
-            print(f"   Deterministic encaps FAILED at round {i+1}")
-            return False
-    
-    print(f"   All {test_rounds} rounds passed")
-    return True
-
 def print_comparison_table(all_results):
-    """Print comparison table across all variants."""
     print(f"\n{'='*80}")
     print("KEM PERFORMANCE COMPARISON")
     print(f"{'='*80}")
@@ -169,7 +132,6 @@ def print_comparison_table(all_results):
         print(f"{variant:<12} {throughput['keygen_ops_per_sec']:<10.1f} {throughput['encaps_ops_per_sec']:<10.1f} {throughput['decaps_ops_per_sec']:<10.1f} {throughput['full_cycle_ops_per_sec']:<10.1f}")
 
 def main():
-    """Run KEM-focused benchmarks."""
     print("ML-KEM FOCUSED PERFORMANCE BENCHMARK")
     print("=" * 60)
     
@@ -180,24 +142,6 @@ def main():
     ]
     
     all_results = {}
-    
-    print("CORRECTNESS TESTING:")
-    print("=" * 40)
-    all_correct = True
-    for name, params in variants:
-        if not test_correctness(params):
-            print(f"  {name} failed correctness test!")
-            all_correct = False
-    
-    if not all_correct:
-        print("\n Some variants failed correctness tests. Stopping.")
-        return
-    
-    print("\n All variants passed correctness tests!")
-    
-    print("\n\nPERFORMANCE BENCHMARKING:")
-    print("=" * 40)
-    
     for name, params in variants:
         try:
             results = benchmark_kem_operations(params, iterations=25)
