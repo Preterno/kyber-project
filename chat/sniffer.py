@@ -1,7 +1,7 @@
 from scapy.all import sniff, TCP, Raw, get_if_list
 import re
 
-TARGET_PORT = 65432  # Same port used in your chat app
+TARGET_PORT = 65432  
 
 def packet_callback(packet):
     if packet.haslayer(TCP) and packet.haslayer(Raw):
@@ -9,7 +9,7 @@ def packet_callback(packet):
         payload = packet[Raw].load
 
         try:
-            # Try to decode as ASCII
+            
             printable = payload.decode('ascii')
             looks_plain = bool(re.match(r'^[\x20-\x7E\r\n\t]+$', printable))
 
